@@ -1,0 +1,25 @@
+# Synchronize milestones
+name: sync
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      INPUT_READ_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      INPUT_WRITE_TOKEN: ${{ secrets.CHE_BOT_TOKEN }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    - name: synchronize
+      run: |
+        yarn
+        yarn run compile
+        node dist/entrypoint.js
