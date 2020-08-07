@@ -3,9 +3,9 @@ import 'reflect-metadata';
 
 import { Container } from 'inversify';
 import { Handler } from '../../src/api/handler';
-import { bindMultiInjectProvider } from '../../src/api/multi-inject-provider';
-import { PushListener } from '../../src/api/push-listener';
 import { PushHandler } from '../../src/handler/push-handler';
+import { PushListener } from '../../src/api/push-listener';
+import { bindMultiInjectProvider } from '../../src/api/multi-inject-provider';
 
 describe('Test Push Handler', () => {
   let container: Container;

@@ -9,6 +9,7 @@ import { apisModule } from './api/apis-module';
 import { fetchersModule } from './fetchers/fetchers-module';
 import { handlersModule } from './handler/handlers-module';
 import { helpersModule } from './helpers/helpers-module';
+import { infosModule } from './info/infos-module';
 import { logicModule } from './logic/logic-module';
 
 export class InversifyBinding {
@@ -23,6 +24,7 @@ export class InversifyBinding {
     this.container.load(fetchersModule);
     this.container.load(handlersModule);
     this.container.load(helpersModule);
+    this.container.load(infosModule);
     this.container.load(logicModule);
 
     // token
@@ -34,6 +36,7 @@ export class InversifyBinding {
     this.container.bind(Octokit).toConstantValue(readOctokit).whenTargetNamed('READ_TOKEN');
     this.container.bind('string').toConstantValue(`token ${this.readToken}`).whenTargetNamed('GRAPHQL_READ_TOKEN');
 
+    this.container.bind('number').toConstantValue(50).whenTargetNamed('MAX_SET_MILESTONE_PER_RUN');
     this.container.bind('number').toConstantValue(50).whenTargetNamed('MAX_CREATE_MILESTONE_PER_RUN');
     this.container.bind('number').toConstantValue(50).whenTargetNamed('MAX_UPDATE_MILESTONE_PER_RUN');
 

@@ -1,10 +1,12 @@
+import * as moment from 'moment';
+
 import { MilestoneDefinition, MilestoneHelper } from '../helpers/milestone-helper';
 import { inject, injectable, named } from 'inversify';
-import * as moment from 'moment';
+
 import { CheRepositoriesFetcher } from '../fetchers/che-repositories-fetcher';
 import { Logic } from '../api/logic';
-import { ScheduleListener } from '../api/schedule-listener';
 import { PushListener } from '../api/push-listener';
+import { ScheduleListener } from '../api/schedule-listener';
 
 export interface MilestoneSyncRepository {
   owner: string;
@@ -80,8 +82,8 @@ export class SyncMilestoneLogic implements Logic, ScheduleListener, PushListener
         if (cheMilestoneDetails.dueOn !== null) {
           cheMilestoneDate = moment(cheMilestoneDetails.dueOn).format('YYYY-MM-DD');
         } else {
-        // eslint-disable-next-line no-null/no-null
-        cheMilestoneDate = null;
+          // eslint-disable-next-line no-null/no-null
+          cheMilestoneDate = null;
         }
 
         const entry = {
@@ -94,22 +96,21 @@ export class SyncMilestoneLogic implements Logic, ScheduleListener, PushListener
             number: repoMilestoneDetails ? repoMilestoneDetails.number : cheMilestoneDetails.number,
             description: cheMilestoneDetails.description,
             dueOn: cheMilestoneDate,
-            state: cheMilestoneDetails.state
-          }
+            state: cheMilestoneDetails.state,
+          },
         };
         // do not exists
         if (!repoMilestoneDetails) {
           milestonesToAdd.push(entry);
         } else {
-
           let repoMilestoneDate;
 
           // eslint-disable-next-line no-null/no-null
-           if (repoMilestoneDetails.dueOn !== null) {
+          if (repoMilestoneDetails.dueOn !== null) {
             repoMilestoneDate = moment(repoMilestoneDetails.dueOn).format('YYYY-MM-DD');
           } else {
-           // eslint-disable-next-line no-null/no-null
-           repoMilestoneDate = null;
+            // eslint-disable-next-line no-null/no-null
+            repoMilestoneDate = null;
           }
           if (
             cheMilestoneDetails.title !== repoMilestoneDetails.title ||

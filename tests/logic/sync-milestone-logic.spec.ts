@@ -32,7 +32,16 @@ describe('Test Sync Milestone Logic', () => {
     container.bind('string').toConstantValue('fooToken').whenTargetNamed('GRAPHQL_READ_TOKEN');
   });
 
+  afterEach(() => {
+    jest.resetModules();
+  });
+
   test('test no che milestone', async () => {
+    // mock got
+    const yaml = await fs.readFile(path.join(__dirname, '..', '_data', 'fetcher', 'che-repositories-fetcher.yaml'), 'utf8');
+    jest.mock('axios');
+    (axios as any).__setContent(CheRepositoriesFetcher.CHE_REPOSITORIES_YAML, yaml);
+
     container.bind('number').toConstantValue(50).whenTargetNamed('MAX_CREATE_MILESTONE_PER_RUN');
     container.bind('number').toConstantValue(50).whenTargetNamed('MAX_UPDATE_MILESTONE_PER_RUN');
     const syncMilestoneLogic = container.get(SyncMilestoneLogic);
@@ -40,11 +49,6 @@ describe('Test Sync Milestone Logic', () => {
     const json = await fs.readFile(path.join(__dirname, '..', '_data', 'helper', 'search-milestone-no-che-milestones.json'), 'utf8');
     const parsedJSON = JSON.parse(json);
     (graphql as any).__setDefaultExports(parsedJSON);
-
-    // mock got
-    const yaml = await fs.readFile(path.join(__dirname, '..', '_data', 'fetcher', 'che-repositories-fetcher.yaml'), 'utf8');
-    jest.mock('axios');
-    (axios as any).__setContent(CheRepositoriesFetcher.CHE_REPOSITORIES_YAML, yaml);
 
     await syncMilestoneLogic.execute();
     expect(octokit.issues.createMilestone).toHaveBeenCalledTimes(0);
@@ -98,7 +102,7 @@ describe('Test Sync Milestone Logic', () => {
       const createMilestoneParams: Octokit.IssuesCreateMilestoneParams = call[0];
       return createMilestoneParams.repo === 'che-sidecar-java' && createMilestoneParams.title === '7.30';
     });
-    const createCall = createCallArgs[0] ;
+    const createCall = createCallArgs[0];
 
     expect(createCall.owner).toBe('che-dockerfiles');
     expect(createCall.title).toBe('7.30');

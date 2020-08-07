@@ -59,7 +59,6 @@ describe('Test Helper MilestoneHelper', () => {
     expect(createMilestoneParams.repo).toBe(repoName);
   });
 
-
   test('test call correct API for create milestone with null', async () => {
     const addMilestoneHelper = container.get(MilestoneHelper);
 
@@ -122,7 +121,6 @@ describe('Test Helper MilestoneHelper', () => {
     expect(createMilestoneParams.repo).toBe(repoName);
     expect(createMilestoneParams.repo).toBe(repoName);
   });
-
 
   test('test call correct API for update milestone with null', async () => {
     const addMilestoneHelper = container.get(MilestoneHelper);
