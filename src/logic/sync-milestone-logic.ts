@@ -80,7 +80,7 @@ export class SyncMilestoneLogic implements Logic, ScheduleListener, PushListener
         let cheMilestoneDate;
         // eslint-disable-next-line no-null/no-null
         if (cheMilestoneDetails.dueOn !== null) {
-          cheMilestoneDate = moment(cheMilestoneDetails.dueOn).format('YYYY-MM-DD');
+          cheMilestoneDate = moment(cheMilestoneDetails.dueOn).format('YYYY-MM-DDTHH:MM:SSZ');
         } else {
           // eslint-disable-next-line no-null/no-null
           cheMilestoneDate = null;
@@ -107,7 +107,7 @@ export class SyncMilestoneLogic implements Logic, ScheduleListener, PushListener
 
           // eslint-disable-next-line no-null/no-null
           if (repoMilestoneDetails.dueOn !== null) {
-            repoMilestoneDate = moment(repoMilestoneDetails.dueOn).format('YYYY-MM-DD');
+            repoMilestoneDate = moment(repoMilestoneDetails.dueOn).format('YYYY-MM-DDTHH:MM:SSZ');
           } else {
             // eslint-disable-next-line no-null/no-null
             repoMilestoneDate = null;
