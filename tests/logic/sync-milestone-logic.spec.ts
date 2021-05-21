@@ -108,7 +108,7 @@ describe('Test Sync Milestone Logic', () => {
     expect(createCall.title).toBe('7.30');
     expect(createCall.repo).toBe('che-sidecar-java');
     // date is stripped from timezone
-    expect(createCall.due_on).toBe('2019-11-06');
+    expect(createCall.due_on).toBe('2019-11-06T01:11:00+01:00');
     expect(createCall.state).toBe('open');
   });
 });

@@ -26,7 +26,7 @@ describe('Test CheVersionFetcher', () => {
 
     const foundVersion = await cheVersionFetcher.getVersion();
     expect(foundVersion).toBeDefined();
-    expect(foundVersion).toBe('7.13.0');
+    expect(foundVersion).toBe('7.31.0');
 
     // Change the content, so it shouldn't be call it anymore
     (axios as any).__setContent(CheVersionFetcher.CHE_POM_XML, 'invalid');
