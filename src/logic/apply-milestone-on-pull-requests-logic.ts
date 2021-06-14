@@ -67,7 +67,7 @@ export class ApplyMilestoneOnPullRequestsLogic implements Logic, ScheduleListene
       const targetBranch = pullRequest.mergingBranch;
       const nameWithOwner = `${pullRequest.owner}/${pullRequest.repo}`;
 
-      if (targetBranch === 'master') {
+      if (targetBranch === 'master' || targetBranch === 'main') {
         // check if tag exists (for example during the day of the release it might happen that repo are not sync)
         const tagDefinitions = latestTags.get(nameWithOwner);
         let tagDefinition;
