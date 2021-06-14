@@ -19,6 +19,9 @@ export class IssueMilestoneHelper {
 
     // search milestone on the repo
     const issuesGetMilestonesParams: Octokit.IssuesListMilestonesForRepoParams = {
+      per_page: 100,
+      state: 'all',
+      direction: 'desc',
       owner: issueInfo.owner,
       repo: issueInfo.repo,
     };
