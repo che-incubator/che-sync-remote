@@ -49,12 +49,15 @@ export class SyncMilestoneLogic implements Logic, ScheduleListener, PushListener
       repositories.map(repository => repository.url.substring('https://github.com/'.length))
     );
 
-    // filter out all starting with 7.x and upwards
-    const cheMilestones = milestonesPerRepository.get('eclipse/che');
-    let filteredMilestones: string[] = [];
-    if (!cheMilestones) {
+    const allCheMilestones =  milestonesPerRepository.get('eclipse/che');
+    if (!allCheMilestones) {
       return;
     }
+    // Keep only last 20 items
+    const arrayTmp = Array.from(allCheMilestones).slice(0, 20);
+    const cheMilestones = new Map(arrayTmp);
+
+    let filteredMilestones: string[] = [];
     filteredMilestones = Array.from(cheMilestones.keys()).filter(milestone => {
       const firstChar = milestone[0];
       const intVal = Number(firstChar);

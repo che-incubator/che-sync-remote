@@ -154,7 +154,7 @@ describe('Test Helper MilestoneHelper', () => {
     expect(createMilestoneParams.repo).toBe(repoName);
   });
 
-  test('test search milestone', async () => {
+  test('search milestone', async () => {
     const milestoneHelper = container.get(MilestoneHelper);
     jest.mock('@octokit/graphql');
     const json = await fs.readFile(path.join(__dirname, '..', '_data', 'helper', 'search-milestone.json'), 'utf8');
@@ -168,6 +168,33 @@ describe('Test Helper MilestoneHelper', () => {
 
     // should have 3 repositories with milestones
     expect(map.size).toBe(3);
+
+    const cheMilestones = map.get('eclipse/che');
+
+    expect(cheMilestones).toBeDefined();
+    const milestone760 = cheMilestones!.get('7.6.0');
+    expect(milestone760).toBeDefined();
+    expect(milestone760!.description).toBe('');
+    expect(milestone760!.number).toBe(107);
+    expect(milestone760!.title).toEqual('7.6.0');
+    expect(milestone760!.state).toEqual('closed');
+    expect(milestone760!.dueOn).toEqual('2019-12-18T00:00:00Z');
+  });
+
+  test('search milestone with additional entries', async () => {
+    const milestoneHelper = container.get(MilestoneHelper);
+    jest.mock('@octokit/graphql');
+    const json = await fs.readFile(path.join(__dirname, '..', '_data', 'helper', 'search-milestone-additional-entries.json'), 'utf8');
+    const parsedJSON = JSON.parse(json);
+    (graphql as any).__setDefaultExports(parsedJSON);
+
+    const anotherSON = JSON.parse(json);
+    anotherSON.search.edges[0].node.milestones.pageInfo.hasNextPage = false;
+    (graphql as any).__setDefaultExports(anotherSON);
+    const map = await milestoneHelper.searchMilestones(['eclipse/che']);
+
+    // should have 1 repositories with milestones
+    expect(map.size).toBe(1);
 
     const cheMilestones = map.get('eclipse/che');
 

@@ -117,21 +117,22 @@ export class MilestoneHelper {
         milestoneNode.state = milestoneNode.state.toLowerCase();
         milestoneMap.set(milestoneNode.title, milestoneNode as MilestoneDefinition);
       });
-      milestones.set(repoName, milestoneMap);
+      const existing = milestones.get(repoName) || new Map();
+      milestones.set(repoName, new Map([...milestoneMap, ...existing]));
     });
 
     return milestones;
   }
 
-  protected async doSearchMilestones(queryRepositories: string, cursor?: string, previousMilestones?: unknown[]): Promise<unknown[]> {
+  protected async doSearchMilestones(queryRepositories: string, cursorRepository?: string, cursorMilestones?: string, previousMilestones?: unknown[]): Promise<unknown[]> {
     const query = `
-    query getMilestones($queryRepositories: String!, $cursorAfter: String){
+    query getMilestones($queryRepositories: String!, $cursorRepositoryAfter: String, $cursorMilestoneAfter: String){
       rateLimit{
        cost
        remaining
        resetAt
       }
-      search(query:$queryRepositories, type:REPOSITORY, first:100, after: $cursorAfter){  
+      search(query:$queryRepositories, type:REPOSITORY, first:100, after: $cursorRepositoryAfter){  
        pageInfo {
                ... on PageInfo {
                  endCursor
@@ -147,8 +148,15 @@ export class MilestoneHelper {
           owner{
            login
           }
-          milestones(first:50, orderBy: {field: CREATED_AT, direction: DESC}) {
-           nodes {
+          milestones(first:50, after: $cursorMilestoneAfter, orderBy: {field: CREATED_AT, direction: DESC}) {
+            totalCount
+            pageInfo {
+              ... on PageInfo {
+                endCursor
+                hasNextPage
+              }
+            }
+            nodes {
              ... on Milestone {
                title,
                number,
@@ -169,7 +177,8 @@ export class MilestoneHelper {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const graphQlResponse: any = await graphql(query, {
       queryRepositories: queryRepositories,
-      cursorAfter: cursor,
+      cursorRepositoryAfter: cursorRepository,
+      cursorMilestoneAfter: cursorMilestones,
       headers: {
         authorization: this.graphqlReadToken,
       },
@@ -182,10 +191,27 @@ export class MilestoneHelper {
       allGraphQlResponse = graphQlResponse.search.edges;
     }
 
-    // need to loop again
-    if (graphQlResponse.search.pageInfo.hasNextPage) {
+    // need to loop again on milestones before looping on repositories
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const milestonesWithNextCursors: Array<any> = graphQlResponse.search.edges.map((edge: any) => {
+      if (edge.node.milestones.pageInfo?.hasNextPage) {
+        return edge.node.milestones.pageInfo.endCursor;
+      } else {
+        return undefined;
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }).filter((value: any) => {if (value) {return value;}});
+    let nextCursorMilestone;
+    if (milestonesWithNextCursors.length > 0) {
+      nextCursorMilestone = milestonesWithNextCursors[0];
+    }
+
+    if (nextCursorMilestone) {
       // needs to redo the search starting from the last search
-      return await this.doSearchMilestones(queryRepositories, graphQlResponse.search.pageInfo.endCursor, allGraphQlResponse);
+      return await this.doSearchMilestones(queryRepositories, cursorRepository, nextCursorMilestone, allGraphQlResponse);
+    } else if (graphQlResponse.search.pageInfo.hasNextPage) {
+      // needs to redo the search starting from the last search
+      return await this.doSearchMilestones(queryRepositories, graphQlResponse.search.pageInfo.endCursor, cursorMilestones, allGraphQlResponse);
     }
 
     // from reverse order
