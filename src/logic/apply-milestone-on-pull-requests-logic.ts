@@ -53,7 +53,7 @@ export class ApplyMilestoneOnPullRequestsLogic implements Logic, ScheduleListene
     }
 
     // get all PR without milestone
-    const recentPullRequestsWithoutMilestone: PullRequestInfo[] = await this.pullRequestsHelper.getRecentMerged(moment.duration(1, 'hour'));
+    const recentPullRequestsWithoutMilestone: PullRequestInfo[] = await this.pullRequestsHelper.getRecentMerged(moment.duration(10, 'hour'));
 
     const latestTags: Map<string, TagDefinition[]> = await this.tagsHelper.getLatestTags();
 
