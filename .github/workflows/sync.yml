@@ -4,8 +4,6 @@ name: sync
 on:
   push:
     branches: [ master ]
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:   
 
 jobs:
