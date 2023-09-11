@@ -21,16 +21,21 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11' 
+    - name: install yq jq 
+      run: |
+        python -m ensurepip --upgrade; pip install yq jq
     - name: synchronize
       run: |
         yarn
         yarn run compile
         node dist/entrypoint.js
 
-        # check results
-        python -m ensurepip --upgrade; pip install yq jq
+    - name: check results
+      run: |
         curl -sSLkO https://raw.githubusercontent.com/eclipse/che/main/.repositories.yaml
         for d in $(yq -r '.[][].url' .repositories.yaml | sed -r -e "s#https://github.com/##" -e "s#/\$##"); do \
           echo; echo $d; \
-          gh api repos/${d}/milestones?state=all\&sort=\&per_page=5\&direction=desc --jq '.[]|(.title +"\t"+ .state)'; \
+          gh api repos/${d}/milestones --jq '.[].title'
+          # note: can query for more information
+          # gh api repos/${d}/milestones?state=all\&per_page=500\&direction=desc --jq '.[]|(.title +"\t"+ .state)'; \
         done
