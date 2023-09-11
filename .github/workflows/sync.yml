@@ -6,13 +6,13 @@ on:
     branches: [ main ]
   workflow_dispatch:
     inputs: {}
-
 jobs:
   sync:
     runs-on: ubuntu-latest
     env:
       INPUT_READ_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       INPUT_WRITE_TOKEN: ${{ secrets.CHE_BOT_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v3
