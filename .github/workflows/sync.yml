@@ -30,4 +30,7 @@ jobs:
         # check results
         python -m ensurepip --upgrade; pip install yq jq
         curl -sSLkO https://raw.githubusercontent.com/eclipse/che/main/.repositories.yaml
-        for d in $(yq -r '.[][].url' .repositories.yaml | sed -r -e "s#https://github.com/##" -e "s#/\$##"); do echo; echo $d; gh api repos/${d}/milestones --jq '.[].title'; done
+        for d in $(yq -r '.[][].url' .repositories.yaml | sed -r -e "s#https://github.com/##" -e "s#/\$##"); do \
+          echo; echo $d; \
+          gh api repos/${d}/milestones?state=all\&sort=\&per_page=5\&direction=desc --jq '.[]|(.title +"\t"+ .state)'; \
+        done
